@@ -42,3 +42,12 @@ impl DictReader {
         lines
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn my_test() {
+
+    }
+
+}

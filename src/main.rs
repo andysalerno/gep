@@ -20,7 +20,7 @@ fn main() {
     }
 
     let master_password = prompt_master_password()
-        .unwrap_or_else(|_| util::exit_with_message::<String>(config::EXCEEDED_ATTEMPTS));
+        .unwrap_or_else(|_| util::exit_with_message(config::EXCEEDED_ATTEMPTS));
 
     let salt_num = if opt.rand_num {
         Some(util::secure_rand_u8())

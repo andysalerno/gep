@@ -27,11 +27,11 @@ impl DictReader {
         self.wordvec.len()
     }
 
-    pub fn get_nth_word(&self, n: usize) -> &str {
-        &self.wordvec[n]
+    pub fn get_wordvec(&self) -> &Vec<String> {
+        &self.wordvec
     }
 
-    fn dict_to_wordvec(filepath: &str) -> Vec<String> {
+    pub fn dict_to_wordvec(filepath: &str) -> Vec<String> {
         let file =
             File::open(filepath).expect(&format!("couldn't open dictionary file with path: {}", filepath));
 

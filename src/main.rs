@@ -19,6 +19,12 @@ fn main() {
         util::output(config::DEBUG_WARNING);
     }
 
+    // TODO: you should print the dict hash value,
+    // so users can confirm the dict hasn't changed
+
+    // and determined indexnum should depend on master pw only?
+    // so always the same regardless of rest of precursor?
+
     let master_password = prompt_master_password()
         .unwrap_or_else(|_| util::exit_with_message(config::EXCEEDED_ATTEMPTS));
 
@@ -39,7 +45,14 @@ fn main() {
     if opt.hex {
         util::output(&format!("{:x}", hashed));
     } else {
-        let result = password_from_hash(hashed, salt_num, opt.dict);
+        let dict_reader = match opt.dict {
+            Some(dict_path) => DictReader::new(dict_path),
+            None => DictReader::new(String::from(config::DEFAULT_DICT_PATH)),
+        };
+
+        let wordvec = dict_reader.get_wordvec();
+
+        let result = password_from_hash(hashed, salt_num, &wordvec);
         util::output(&result);
     }
 }
@@ -71,22 +84,15 @@ fn build_precursor(
 fn password_from_hash(
     hash: util::HashResult,
     salt_num: Option<u8>,
-    dict: Option<String>,
+    wordvec: &Vec<String>,
 ) -> String {
     let mut words: [String; config::PASS_WORD_LEN] = Default::default();
-
-    let dict_reader = match dict {
-        Some(dict_path) => DictReader::new(dict_path),
-        None => DictReader::new(String::from(config::DEFAULT_DICT_PATH)),
-    };
-
-    let dict_len = dict_reader.len();
 
     for i in 0..config::PASS_WORD_LEN {
         let v = i * 4;
         let couplet = util::combine_as_u32(hash[v], hash[v + 1], hash[v + 2], hash[v + 3]);
 
-        let word = dict_reader.get_nth_word(util::reduce_range(couplet, dict_len));
+        let word = wordvec.get(util::reduce_range(couplet, wordvec.len())).unwrap();
         let word_title_cased = util::as_titlecase(word);
         words[i] = String::from(word_title_cased);
     }

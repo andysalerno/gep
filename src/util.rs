@@ -12,6 +12,15 @@ pub fn hash(string: &str) -> HashResult {
     Sha3_256::digest(string.as_bytes())
 }
 
+pub fn hash_slice(slice: &[String]) -> HashResult {
+    let mut hasher = Sha3_256::new();
+    for each in slice {
+        hasher.input(each.as_bytes());
+    }
+
+    hasher.result()
+}
+
 pub fn output(s: &str) {
     println!("{}", s);
 }

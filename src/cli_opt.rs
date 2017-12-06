@@ -9,10 +9,12 @@ pub struct CliOpt {
     pub dict: Option<String>,
     #[structopt(short = "n", long = "num", help = "A number used to salt the hashed value")]
     pub num: Option<u8>,
-    #[structopt(short = "r", long = "rand_num", help = "Pick a random u8 to salt the hash value")]
+    #[structopt(short = "r", long = "rand-num", help = "Pick a random u8 to salt the hash value")]
     pub rand_num: bool,
     #[structopt(short = "x", long = "hex", help = "Return the raw hash hex output, instead of building a password from dictionary words.")]
     pub hex: bool,
     #[structopt(short = "D", long = "debug", help = "Print additional information, including the precursor hash value. WARNING: this includes the master password, which is also printed!")]
     pub debug: bool,
+    #[structopt(short = "H", long = "dict-hash", help = "Print the dictionary hash.")]
+    pub print_dict_hash: bool,
 }

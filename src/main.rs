@@ -19,9 +19,6 @@ fn main() {
         util::output(config::DEBUG_WARNING);
     }
 
-    // TODO: you should print the dict hash value,
-    // so users can confirm the dict hasn't changed
-
     // and determined indexnum should depend on master pw only?
     // so always the same regardless of rest of precursor?
 
@@ -52,7 +49,12 @@ fn main() {
 
         let wordvec = dict_reader.get_wordvec();
 
-        let result = password_from_hash(hashed, salt_num, &wordvec);
+        if opt.print_dict_hash {
+            let dict_hash = util::hash_slice(wordvec);
+            util::output(&format!("{} {:x}", config::DICT_HASH_LABEL, dict_hash));
+        }
+
+        let result = password_from_hash(hashed, salt_num, wordvec);
         util::output(&result);
     }
 }
@@ -84,7 +86,7 @@ fn build_precursor(
 fn password_from_hash(
     hash: util::HashResult,
     salt_num: Option<u8>,
-    wordvec: &Vec<String>,
+    wordvec: &[String],
 ) -> String {
     let mut words: [String; config::PASS_WORD_LEN] = Default::default();
 

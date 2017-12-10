@@ -1,6 +1,34 @@
 # 'Good Enough Passwords'
+A tool for generating memorable passwords 
 
 ## 'Good Enough'
+The most important aspect of this tool is the term "good enough" and what that is intended to mean.
+
+Consider three people, Sue, Jenny, and Ann.
+
+Sue:
+* uses one memorable password everywhere
+* is satisfied because most site registrations tell her her password is "Strong"
+* once created an online account with her local gym and has noticed login attempts on her Gmail from Malaysia ever since
+
+Jenny:
+* uses Lastpass, Keepass, what have you
+* has no clue what any of her own passwords are
+* occasionally loses access to her password service and must reset her bank account's password to gain access
+    * (and then forgets to update the service with this new password, so must repeat this the next time she tries to log in)
+
+Ann:
+* carries an encrypted password vault on a dedicated usb drive that also displays 2FA codes
+* uses the Schneier password scheme to keep track of dozens of unique passwords across many services
+* updates all of these passwords every three months
+* only sends pgp-encrypted emails
+
+We all want to be Ann.  We've all probably been Sue and Jenny at some point.
+
+I wanted to create a simple tool that might help me personally do better than Sue and Jenny, since I can never be Ann.
+
+So what does 'good enough' mean?  It means 'not audited', it means 'weekend project', it means 'possibly has a gaping flaw that nullifies the whole thing', it means 'I can't be Ann but I want to do better than Sue and Jenny'.
+
 
 ## Logic
 

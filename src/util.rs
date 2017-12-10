@@ -25,6 +25,10 @@ pub fn output(s: &str) {
     println!("{}", s);
 }
 
+pub fn debug_out(s: &str) {
+    output(&format!("> {}", s));
+}
+
 pub fn exit_with_message<T>(s: &str) -> T {
     output(s);
     ::std::process::exit(1);

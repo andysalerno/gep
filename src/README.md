@@ -1,6 +1,9 @@
 # 'Good Enough Passwords'
 
+## 'Good Enough'
+
 ## Logic
+
 
 ### Examples
 

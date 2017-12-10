@@ -1,43 +1,29 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-
-const MIN_ALLOWED_SIZE: usize = 10_000;
+use util;
+use config;
 
 pub struct DictReader {
     filepath: String,
-    wordvec: Vec<String>,
 }
 
 impl DictReader {
-    pub fn new(filepath: String) -> DictReader {
-        let wordvec = DictReader::dict_to_wordvec(&filepath);
-
-        if wordvec.len() < MIN_ALLOWED_SIZE {
-            panic!("The minimum allowed dictionary length is: {}. Cannot use dict '{}' with length: {}",
-            MIN_ALLOWED_SIZE, filepath, wordvec.len());
-        }
-
+    pub fn new(filepath: &str) -> DictReader {
         DictReader {
-            filepath: filepath,
-            wordvec: wordvec,
+            filepath: String::from(filepath),
         }
     }
 
-    pub fn len(&self) -> usize {
-        self.wordvec.len()
-    }
+    pub fn get_wordvec(&self) -> Vec<String> {
+        let filepath = &self.filepath;
 
-    pub fn get_wordvec(&self) -> &[String] {
-        &self.wordvec
-    }
-
-    fn dict_to_wordvec(filepath: &str) -> Vec<String> {
-        let file =
-            File::open(filepath).expect(&format!("couldn't open dictionary file with path: {}", filepath));
+        let file = File::open(filepath).unwrap_or_else(|_| {
+            util::exit_with_message(&format!("{}: {}", config::WORDLIST_READ_ERR, filepath))
+        });
 
         let reader = BufReader::new(file);
 
-        let lines: Vec<String> = reader.lines().filter_map(|l| l.ok()).collect();
+        let lines: Vec<String> = reader.lines().map(|l| l.unwrap()).collect();
 
         lines
     }
@@ -46,8 +32,6 @@ impl DictReader {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn my_test() {
-
-    }
+    fn my_test() {}
 
 }

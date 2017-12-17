@@ -5,8 +5,14 @@ extern crate sha3;
 use self::sha3::{Digest, Sha3_256};
 use self::generic_array::{typenum, GenericArray};
 use self::rand::{OsRng, Rng};
+use std::io::Write;
 
 pub type HashResult = GenericArray<u8, typenum::U32>;
+
+pub enum WriteDest {
+    StdOut,
+    Filename(String),
+}
 
 pub fn hash(string: &str) -> HashResult {
     Sha3_256::digest(string.as_bytes())
@@ -21,16 +27,21 @@ pub fn hash_slice(slice: &[String]) -> HashResult {
     hasher.result()
 }
 
-pub fn output(s: &str) {
-    println!("{}", s);
-}
-
-pub fn debug_out(s: &str) {
-    output(&format!("> {}", s));
+pub fn write(dest: &WriteDest, val: &str) {
+    match dest {
+        &WriteDest::StdOut => {
+            ::std::io::stdout().write(val.as_bytes());
+        }
+        &WriteDest::Filename(ref c) => {
+            let mut file = ::std::fs::File::create(c).unwrap();
+            file.write(val.as_bytes());
+        }
+    };
 }
 
 pub fn exit_with_message<T>(s: &str) -> T {
-    output(s);
+    let std_err_writer: Box<::std::io::Write> = Box::new(::std::io::stderr());
+    write(&WriteDest::StdOut, s);
     ::std::process::exit(1);
 }
 

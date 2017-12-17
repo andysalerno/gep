@@ -4,8 +4,10 @@
 pub struct CliOpt {
     #[structopt(short = "s", long = "site", help = "Site name, like `hackernews` (case insensitive)")]
     pub site: String,
-    #[structopt(short = "u", long = "username", help = "Username (case insensitive). Optional but recommended")]
+    #[structopt(short = "u", long = "username", help = "Username (case insensitive)")]
     pub username: Option<String>,
+    #[structopt(short = "p", long = "password", help = "If provided, skips password prompt")]
+    pub password: Option<String>,
     #[structopt(short = "d", long = "dict", help = "Path to a newline-delimited dictionary to be used instead of the included dictionary")]
     pub dict: Option<String>,
     #[structopt(short = "n", long = "num", help = "A number used to salt the hashed value")]
@@ -18,4 +20,6 @@ pub struct CliOpt {
     pub debug: bool,
     #[structopt(short = "H", long = "dict-hash", help = "Print the dictionary hash.")]
     pub print_dict_hash: bool,
+    #[structopt(short = "o", long = "output-file", help = "Path to output file where password is printed; defaults to stdout")]
+    pub output_filename: Option<String>,
 }

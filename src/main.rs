@@ -17,12 +17,22 @@ use password_engine::{GeneratedPassword, PasswordEngine};
 fn main() {
     let opt = CliOpt::from_args();
 
+    let info_dest = util::WriteDest::StdOut;
+    let password_dest = match opt.output_filename {
+        Some(s) => util::WriteDest::Filename(s),
+        None => util::WriteDest::StdOut,
+    };
+
     if opt.debug {
-        util::debug_out(config::DEBUG_WARNING);
+        util::write(&util::WriteDest::StdOut, config::DEBUG_WARNING);
     }
 
-    let master_password = prompt_master_password()
-        .unwrap_or_else(|_| util::exit_with_message(config::EXCEEDED_ATTEMPTS));
+    let master_password = if let Some(p) = opt.password {
+        p
+    } else {
+        prompt_master_password()
+            .unwrap_or_else(|_| util::exit_with_message(config::EXCEEDED_ATTEMPTS))
+    };
 
     let salt_num = if opt.rand_num {
         Some(util::secure_rand_u8())
@@ -51,21 +61,34 @@ fn main() {
 
     if opt.print_dict_hash {
         let dict_hash = util::hash_slice(&wordvec);
-        util::output(&format!("{}: {:x}", config::DICT_HASH_LABEL, dict_hash));
+        //util::output(&format!("{}: {:x}", config::DICT_HASH_LABEL, dict_hash));
+        util::write(
+            &info_dest,
+            &format!("{}: {:x}", config::DICT_HASH_LABEL, dict_hash),
+        );
     }
 
     if opt.debug {
-        util::debug_out(&format!(
-            "{}: {}",
-            config::TAG_PRECURSOR,
-            generated_password.precursor()
-        ));
+        util::write(
+            &info_dest,
+            &format!(
+                "{}: {}",
+                config::TAG_PRECURSOR,
+                generated_password.precursor()
+            ),
+        );
     }
 
     if opt.hex_only {
-        util::output(&format!("{:x}", generated_password.precursor_hashed()));
+        util::write(
+            &password_dest,
+            &format!("{:x}", generated_password.precursor_hashed()),
+        );
     } else {
-        util::output(&format_password_display(generated_password.password()));
+        util::write(
+            &password_dest,
+            &format_password_display(generated_password.password()),
+        );
     }
 }
 
@@ -80,7 +103,7 @@ fn prompt_master_password() -> Result<String, &'static str> {
         if password == password_confirm {
             return Ok(password);
         } else if i < config::PASS_RETRY_ATTEMPTS - 1 {
-            util::output(config::PASS_CONFIRM_MISMATCH);
+            util::write(&util::WriteDest::StdOut, config::PASS_CONFIRM_MISMATCH);
         }
     }
 
@@ -89,15 +112,10 @@ fn prompt_master_password() -> Result<String, &'static str> {
 
 fn check_dict_len(dict: &[String]) {
     if dict.len() < config::MIN_ALLOWED_SIZE {
-        util::output(&config::small_dict_warning());
+        util::write(&util::WriteDest::StdOut, &config::small_dict_warning());
     }
 }
 
 fn format_password_display(password: &str) -> String {
-    format!(
-        "{}\n{}\n{}\n",
-        config::PASS_OUTPUT_FRAME,
-        password,
-        config::PASS_OUTPUT_FRAME
-    )
+    format!("{}\n", password)
 }

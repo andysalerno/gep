@@ -49,7 +49,7 @@ pub fn write(dest: &WriteDest, val: &str) {
 }
 
 pub fn exit_with_message<T>(s: &str) -> T {
-    write(&WriteDest::StdErr, s);
+    write(&WriteDest::StdErr, &format!("{}\n", s));
     ::std::process::exit(1);
 }
 

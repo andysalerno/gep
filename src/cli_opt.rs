@@ -16,8 +16,8 @@ pub struct CliOpt {
     pub rand_num: bool,
     #[structopt(short = "x", long = "hex", help = "Return the raw hash hex output, instead of building a password from dictionary words.")]
     pub hex_only: bool,
-    #[structopt(short = "D", long = "debug", help = "Print additional information, including the precursor hash value. WARNING: this includes the master password, which is also printed!")]
-    pub debug: bool,
+    #[structopt(short = "v", long = "verbose", help = "Print additional information, including the precursor hash value. WARNING: this includes the master password, which is also printed!")]
+    pub verbose: bool,
     #[structopt(short = "H", long = "dict-hash", help = "Print the dictionary hash.")]
     pub print_dict_hash: bool,
     #[structopt(short = "o", long = "output-file", help = "Path to output file where password is printed; defaults to stdout")]

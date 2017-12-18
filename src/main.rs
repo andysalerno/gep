@@ -23,8 +23,8 @@ fn main() {
         None => util::WriteDest::StdOut,
     };
 
-    if opt.debug {
-        util::write(&info_dest, config::DEBUG_WARNING);
+    if opt.verbose {
+        util::write(&info_dest, config::VERBOSE_WARNING);
     }
 
     let master_password = match opt.password {
@@ -60,15 +60,15 @@ fn main() {
         let dict_hash = util::hash_slice(&wordvec);
         util::write(
             &info_dest,
-            &format!("{}: {:x}", config::LABEL_DICT_HASH, dict_hash),
+            &format!("{}: {:x}\n", config::LABEL_DICT_HASH, dict_hash),
         );
     }
 
-    if opt.debug {
+    if opt.verbose {
         util::write(
             &info_dest,
             &format!(
-                "{}: {}",
+                "{}: {}\n",
                 config::LABEL_PRECURSOR,
                 generated_password.precursor()
             ),
@@ -78,7 +78,7 @@ fn main() {
     if opt.hex_only {
         util::write(
             &password_dest,
-            &format!("{:x}", generated_password.precursor_hashed()),
+            &format!("{:x}\n", generated_password.precursor_hashed()),
         );
     } else {
         util::write(
@@ -91,10 +91,10 @@ fn main() {
 fn prompt_master_password() -> Result<String, &'static str> {
     for i in 0..config::MASTER_RETRY_ATTEMPTS {
         let password = rpassword::prompt_password_stdout(config::PASS_PROMPT)
-            .expect(config::STDOUT_PROMPT_ERR);
+            .expect(config::ERR_STDOUT_PROMPT);
 
         let password_confirm = rpassword::prompt_password_stdout(config::PASS_CONFIRM)
-            .expect(config::STDOUT_PROMPT_ERR);
+            .expect(config::ERR_STDOUT_PROMPT);
 
         if password == password_confirm {
             return Ok(password);

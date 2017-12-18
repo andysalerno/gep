@@ -18,7 +18,7 @@ impl DictReader {
         let filepath = &self.filepath;
 
         let file = File::open(filepath).unwrap_or_else(|_| {
-            util::exit_with_message(&format!("{}: {}", config::WORDLIST_READ_ERR, filepath))
+            util::exit_with_message(&format!("{}: {}", config::ERR_WORDLIST_READ, filepath))
         });
 
         let reader = BufReader::new(file);

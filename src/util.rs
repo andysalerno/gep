@@ -11,6 +11,7 @@ pub type HashResult = GenericArray<u8, typenum::U32>;
 
 pub enum WriteDest {
     StdOut,
+    StdErr,
     Filename(String),
 }
 
@@ -30,18 +31,25 @@ pub fn hash_slice(slice: &[String]) -> HashResult {
 pub fn write(dest: &WriteDest, val: &str) {
     match dest {
         &WriteDest::StdOut => {
-            ::std::io::stdout().write(val.as_bytes());
+            let _ = ::std::io::stdout().write(val.as_bytes());
+        }
+        &WriteDest::StdErr => {
+            let _ = ::std::io::stderr().write(val.as_bytes());
         }
         &WriteDest::Filename(ref c) => {
-            let mut file = ::std::fs::File::create(c).unwrap();
-            file.write(val.as_bytes());
+            let mut file = ::std::fs::OpenOptions::new()
+                .create(true)
+                .append(true)
+                .open(c)
+                .unwrap();
+
+            let _ = file.write(val.as_bytes());
         }
     };
 }
 
 pub fn exit_with_message<T>(s: &str) -> T {
-    let std_err_writer: Box<::std::io::Write> = Box::new(::std::io::stderr());
-    write(&WriteDest::StdOut, s);
+    write(&WriteDest::StdErr, s);
     ::std::process::exit(1);
 }
 

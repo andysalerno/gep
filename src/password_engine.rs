@@ -73,16 +73,16 @@ impl PasswordEngine {
             combine.push_str(&u.to_lowercase());
         }
 
-        combine.push_str(config::NUM_DELIM);
+        combine.push_str(config::SALT_DELIM);
         combine.push_str(&salt_num.to_string());
 
         combine
     }
 
     fn password_from_hash(hash: util::HashResult, salt_num: u8, wordvec: &[String]) -> String {
-        let mut words: [String; config::PASS_WORD_LEN] = Default::default();
+        let mut words: [String; config::PASS_WORD_COUNT] = Default::default();
 
-        for i in 0..config::PASS_WORD_LEN {
+        for i in 0..config::PASS_WORD_COUNT {
             let v = i * 4;
             let couplet = util::combine_as_u32(hash[v], hash[v + 1], hash[v + 2], hash[v + 3]);
 
@@ -95,6 +95,6 @@ impl PasswordEngine {
 
         let joined_words = words.join(config::WORD_DELIM);
 
-        format!("{}{}{}", joined_words, config::NUM_DELIM, salt_num)
+        format!("{}{}{}", joined_words, config::SALT_DELIM, salt_num)
     }
 }

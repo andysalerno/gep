@@ -12,7 +12,7 @@ mod password_engine;
 use structopt::StructOpt;
 use dict_reader::DictReader;
 use cli_opt::CliOpt;
-use password_engine::{GeneratedPassword, PasswordEngine};
+use password_engine::PasswordEngine;
 
 fn main() {
     let opt = CliOpt::from_args();
@@ -24,14 +24,13 @@ fn main() {
     };
 
     if opt.debug {
-        util::write(&util::WriteDest::StdOut, config::DEBUG_WARNING);
+        util::write(&info_dest, config::DEBUG_WARNING);
     }
 
-    let master_password = if let Some(p) = opt.password {
-        p
-    } else {
-        prompt_master_password()
-            .unwrap_or_else(|_| util::exit_with_message(config::EXCEEDED_ATTEMPTS))
+    let master_password = match opt.password {
+        Some(p) => p,
+        None => prompt_master_password()
+            .unwrap_or_else(|_| util::exit_with_message((config::EXCEEDED_ATTEMPTS))),
     };
 
     let salt_num = if opt.rand_num {
@@ -49,11 +48,9 @@ fn main() {
 
     check_dict_len(&wordvec);
 
-    let username_ref = opt.username.as_ref().map(String::as_str);
-
-    let generated_password: GeneratedPassword = PasswordEngine::generate(
+    let generated_password = PasswordEngine::generate(
         &opt.site,
-        username_ref,
+        opt.username.as_ref().map(String::as_str),
         &master_password,
         &wordvec,
         salt_num,
@@ -61,10 +58,9 @@ fn main() {
 
     if opt.print_dict_hash {
         let dict_hash = util::hash_slice(&wordvec);
-        //util::output(&format!("{}: {:x}", config::DICT_HASH_LABEL, dict_hash));
         util::write(
             &info_dest,
-            &format!("{}: {:x}", config::DICT_HASH_LABEL, dict_hash),
+            &format!("{}: {:x}", config::LABEL_DICT_HASH, dict_hash),
         );
     }
 
@@ -73,7 +69,7 @@ fn main() {
             &info_dest,
             &format!(
                 "{}: {}",
-                config::TAG_PRECURSOR,
+                config::LABEL_PRECURSOR,
                 generated_password.precursor()
             ),
         );
@@ -93,7 +89,7 @@ fn main() {
 }
 
 fn prompt_master_password() -> Result<String, &'static str> {
-    for i in 0..config::PASS_RETRY_ATTEMPTS {
+    for i in 0..config::MASTER_RETRY_ATTEMPTS {
         let password = rpassword::prompt_password_stdout(config::PASS_PROMPT)
             .expect(config::STDOUT_PROMPT_ERR);
 
@@ -102,7 +98,7 @@ fn prompt_master_password() -> Result<String, &'static str> {
 
         if password == password_confirm {
             return Ok(password);
-        } else if i < config::PASS_RETRY_ATTEMPTS - 1 {
+        } else if i < config::MASTER_RETRY_ATTEMPTS - 1 {
             util::write(&util::WriteDest::StdOut, config::PASS_CONFIRM_MISMATCH);
         }
     }
@@ -111,7 +107,7 @@ fn prompt_master_password() -> Result<String, &'static str> {
 }
 
 fn check_dict_len(dict: &[String]) {
-    if dict.len() < config::MIN_ALLOWED_SIZE {
+    if dict.len() < config::MIN_DICT_SIZE {
         util::write(&util::WriteDest::StdOut, &config::small_dict_warning());
     }
 }

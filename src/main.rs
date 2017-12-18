@@ -3,16 +3,16 @@ extern crate structopt;
 #[macro_use]
 extern crate structopt_derive;
 
-mod dict_reader;
+use cli_opt::CliOpt;
+use dict_reader::DictReader;
+use password_engine::PasswordEngine;
+use structopt::StructOpt;
+
 mod cli_opt;
 mod config;
-mod util;
+mod dict_reader;
 mod password_engine;
-
-use structopt::StructOpt;
-use dict_reader::DictReader;
-use cli_opt::CliOpt;
-use password_engine::PasswordEngine;
+mod util;
 
 fn main() {
     let opt = CliOpt::from_args();
